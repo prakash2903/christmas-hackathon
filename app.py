@@ -167,5 +167,16 @@ def download_file(filename):
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+@app.route('/files', methods=['GET'])
+@login_required
+def get_files():
+    try:
+        cursor.execute("SELECT filename, category FROM files")
+        files = cursor.fetchall()
+        return jsonify({"files": [{"filename": f[0], "category": f[1]} for f in files]})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)

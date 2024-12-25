@@ -118,3 +118,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Load files for the dashboard
+    const fileTableBody = document.getElementById('file-table-body');
+    if (fileTableBody) {
+        fetch('http://127.0.0.1:5000/files', {
+            method: 'GET',
+            credentials: 'include', // Include session cookies
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.files) {
+                data.files.forEach(file => {
+                    const row = document.createElement('tr');
+
+                    const filenameCell = document.createElement('td');
+                    filenameCell.textContent = file.filename;
+
+                    const categoryCell = document.createElement('td');
+                    categoryCell.textContent = file.category;
+
+                    const actionCell = document.createElement('td');
+                    const downloadButton = document.createElement('button');
+                    downloadButton.textContent = 'Download';
+                    downloadButton.addEventListener('click', () => {
+                        window.location.href = `http://127.0.0.1:5000/download/${file.filename}`;
+                    });
+                    actionCell.appendChild(downloadButton);
+
+                    row.appendChild(filenameCell);
+                    row.appendChild(categoryCell);
+                    row.appendChild(actionCell);
+
+                    fileTableBody.appendChild(row);
+                });
+            } else {
+                alert(data.error || 'Failed to load files.');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('An error occurred while loading files.');
+        });
+    }
+});
