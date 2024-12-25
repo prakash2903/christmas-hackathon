@@ -164,3 +164,66 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Load categories
+    const categoriesContainer = document.getElementById('categories');
+    const fileTableBody = document.getElementById('file-table-body');
+    const categoryTitle = document.getElementById('category-title');
+
+    if (categoriesContainer) {
+        fetch('http://127.0.0.1:5000/files', {
+            method: 'GET',
+            credentials: 'include',
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.files) {
+                const categories = new Set(data.files.map(file => file.category));
+                categoriesContainer.innerHTML = '';
+                categories.forEach(category => {
+                    const categoryButton = document.createElement('button');
+                    categoryButton.textContent = category;
+                    categoryButton.className = 'bg-blue-600 text-white p-3 rounded hover:bg-blue-700';
+                    categoryButton.addEventListener('click', () => {
+                        displayFilesByCategory(category, data.files);
+                    });
+                    categoriesContainer.appendChild(categoryButton);
+                });
+
+                // Show all files by default
+                displayFilesByCategory('All', data.files);
+            }
+        })
+        .catch(err => console.error(err));
+    }
+
+    function displayFilesByCategory(category, files) {
+        fileTableBody.innerHTML = '';
+        categoryTitle.textContent = category === 'All' ? 'All Files' : `Files in ${category}`;
+        files
+            .filter(file => category === 'All' || file.category === category)
+            .forEach(file => {
+                const row = document.createElement('tr');
+
+                const filenameCell = document.createElement('td');
+                filenameCell.className = 'p-4';
+                filenameCell.textContent = file.filename;
+
+                const actionCell = document.createElement('td');
+                actionCell.className = 'p-4';
+                const downloadButton = document.createElement('button');
+                downloadButton.textContent = 'Download';
+                downloadButton.className = 'bg-green-600 text-white p-2 rounded hover:bg-green-700';
+                downloadButton.addEventListener('click', () => {
+                    window.location.href = `http://127.0.0.1:5000/download/${file.filename}`;
+                });
+                actionCell.appendChild(downloadButton);
+
+                row.appendChild(filenameCell);
+                row.appendChild(actionCell);
+
+                fileTableBody.appendChild(row);
+            });
+    }
+});

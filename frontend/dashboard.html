@@ -4,24 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>File Dashboard</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Filename</th>
-                    <th>Category</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="file-table-body">
-                <!-- Files will be dynamically added here -->
-            </tbody>
-        </table>
-        <button id="logout-btn">Logout</button>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-blue-800 text-white flex flex-col">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold">File Dashboard</h1>
+            </div>
+            <nav class="flex-1 p-4">
+                <ul>
+                    <li class="mb-2">
+                        <a href="upload.html" class="block p-3 rounded hover:bg-blue-700">Upload Files</a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="#" class="block p-3 rounded bg-blue-700">Categories</a>
+                    </li>
+                </ul>
+            </nav>
+            <button id="logout-btn" class="m-6 p-3 bg-red-600 rounded hover:bg-red-700">Logout</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <h2 class="text-2xl font-bold mb-4">Categories</h2>
+            <!-- Categories -->
+            <div id="categories" class="flex flex-wrap gap-4 mb-6">
+                <!-- Categories will be dynamically added here -->
+            </div>
+
+            <!-- Files Table -->
+            <h3 class="text-xl font-bold mb-2" id="category-title">All Files</h3>
+            <table class="w-full bg-white shadow rounded overflow-hidden">
+                <thead>
+                    <tr class="bg-blue-800 text-white">
+                        <th class="p-4 text-left">Filename</th>
+                        <th class="p-4 text-left">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="file-table-body" class="text-gray-700">
+                    <!-- Files will be dynamically added here -->
+                </tbody>
+            </table>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>
