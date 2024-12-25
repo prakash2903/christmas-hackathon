@@ -125,10 +125,11 @@ def upload_file():
             encrypted_file.write(encrypted_content)
 
         # Save metadata to the database
-        encryption_key = key
+        username = session['user']  # Get the logged-in user's username
+        encryption_key = psycopg2.Binary(key)  # Save the key properly for BYTEA
         cursor.execute(
-            "INSERT INTO files (filename, filepath, encryption_key, category) VALUES (%s, %s, %s, %s)",
-            (filename, filepath, encryption_key, category)
+            "INSERT INTO files (filename, filepath, encryption_key, category, username) VALUES (%s, %s, %s, %s, %s)",
+            (filename, filepath, encryption_key, category, username)
         )
         conn.commit()
 
@@ -140,19 +141,25 @@ def upload_file():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+
 @app.route('/download/<filename>', methods=['GET'])
 @login_required
 def download_file(filename):
     try:
+        print(f"Attempting to download file: {filename}")  # Debug log
+
         # Fetch file metadata from the database
         cursor.execute("SELECT filepath, encryption_key FROM files WHERE filename = %s", (filename,))
         result = cursor.fetchone()
 
         if not result:
+            print("File not found in database")  # Debug log
             return jsonify({"error": "File not found"}), 404
 
         filepath, encryption_key = result
-        cipher = Fernet(encryption_key)
+        print(f"Filepath: {filepath}, Encryption Key: {encryption_key}")  # Debug log
+
+        cipher = Fernet(encryption_key)  # Decryption key is already in bytes
 
         # Decrypt the file content
         with open(filepath, 'rb') as encrypted_file:
@@ -164,19 +171,24 @@ def download_file(filename):
         with open(temp_filepath, 'wb') as temp_file:
             temp_file.write(decrypted_content)
 
+        print(f"Decrypted file saved at: {temp_filepath}")  # Debug log
         return send_file(temp_filepath, as_attachment=True)
+
     except Exception as e:
+        print(f"An error occurred: {e}")  # Debug log
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 @app.route('/files', methods=['GET'])
 @login_required
 def get_files():
     try:
-        cursor.execute("SELECT filename, category FROM files")
+        username = session['user']  # Get the logged-in user's username
+        cursor.execute("SELECT filename, category FROM files WHERE username = %s", (username,))
         files = cursor.fetchall()
         return jsonify({"files": [{"filename": f[0], "category": f[1]} for f in files]})
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
 
 
 if __name__ == "__main__":
