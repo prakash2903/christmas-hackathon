@@ -3,30 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Register</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Welcome | Personal Data Vault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <h1>Welcome to the Personal Data Vault</h1>
-        <div id="form-container">
+<body class="bg-gradient-to-r from-blue-500 to-blue-800 min-h-screen flex items-center justify-center">
+    <div class="max-w-lg w-full bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-700 text-white text-center py-6">
+            <h1 class="text-3xl font-bold">Welcome to Personal Data Vault</h1>
+            <p class="mt-2 text-sm">Securely upload, encrypt, and manage your files</p>
+        </div>
+
+        <!-- Forms -->
+        <div class="p-6">
+            <!-- Tab Navigation -->
+            <div class="flex justify-center space-x-6 mb-6">
+                <button id="login-tab" class="tab-button active">Login</button>
+                <button id="register-tab" class="tab-button">Register</button>
+            </div>
+
             <!-- Login Form -->
-            <form id="login-form">
-                <h2>Login</h2>
-                <input type="text" id="login-username" placeholder="Username" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button type="submit">Login</button>
+            <form id="login-form" class="form-content">
+                <h2 class="text-xl font-bold mb-4 text-gray-700">Login</h2>
+                <div class="mb-4">
+                    <label for="login-username" class="block text-gray-600 font-bold mb-2">Username</label>
+                    <input type="text" id="login-username" placeholder="Enter your username" class="input-field">
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block text-gray-600 font-bold mb-2">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" class="input-field">
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
             </form>
 
             <!-- Register Form -->
-            <form id="register-form">
-                <h2>Register</h2>
-                <input type="text" id="register-username" placeholder="Username" required>
-                <input type="password" id="register-password" placeholder="Password" required>
-                <button type="submit">Register</button>
+            <form id="register-form" class="form-content hidden">
+                <h2 class="text-xl font-bold mb-4 text-gray-700">Register</h2>
+                <div class="mb-4">
+                    <label for="register-username" class="block text-gray-600 font-bold mb-2">Username</label>
+                    <input type="text" id="register-username" placeholder="Choose a username" class="input-field">
+                </div>
+                <div class="mb-6">
+                    <label for="register-password" class="block text-gray-600 font-bold mb-2">Password</label>
+                    <input type="password" id="register-password" placeholder="Choose a password" class="input-field">
+                </div>
+                <button type="submit" class="btn-primary">Register</button>
             </form>
         </div>
     </div>
+
+    <script>
+        // Toggle between login and register forms
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        loginTab.addEventListener('click', () => {
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+        });
+
+        registerTab.addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            loginTab.classList.remove('active');
+            registerTab.classList.add('active');
+        });
+    </script>
+
+    <style>
+        .tab-button {
+            background-color: #e2e8f0;
+            padding: 0.5rem 1rem;
+            font-weight: bold;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #1e3a8a;
+            color: white;
+        }
+        .tab-button:hover {
+            background-color: #cbd5e1;
+        }
+        .form-content {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        .hidden {
+            display: none;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
     <script src="script.js"></script>
 </body>
 </html>

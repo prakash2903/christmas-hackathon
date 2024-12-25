@@ -1,13 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Handle login
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
+        console.log('Login form found and ready.'); // Debug message
         loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
+            console.log('Login form submitted.'); // Debug message
+
             try {
                 const username = document.getElementById('login-username').value;
                 const password = document.getElementById('login-password').value;
 
+                console.log(`Sending login request for user: ${username}`); // Debug message
                 const response = await fetch('http://127.0.0.1:5000/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -15,25 +18,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const data = await response.json();
+                console.log('Server response:', data); // Debug message
+
                 if (response.ok) {
                     alert('Login successful!');
-                    window.location.href = 'upload.html'; 
+                    console.log('Redirecting to upload.html');
+                    window.location.href = 'upload.html'; // Redirect to upload.html
                 } else {
-                    console.error(data);
                     alert(data.error || 'Login failed.');
                 }
             } catch (err) {
-                console.error(err);
+                console.error('Error in login form submission:', err);
                 alert('An error occurred. Check the console for details.');
             }
         });
     }
 
-    // Handle registration
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default form submission
+
             try {
                 const username = document.getElementById('register-username').value;
                 const password = document.getElementById('register-password').value;
@@ -47,13 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (response.ok) {
                     alert('Registration successful! Please log in.');
-                    registerForm.reset();
+                    registerForm.reset(); // Clear the form
                 } else {
-                    console.error(data);
                     alert(data.error || 'Registration failed.');
                 }
             } catch (err) {
-                console.error(err);
+                console.error('Error in registration form submission:', err);
                 alert('An error occurred. Check the console for details.');
             }
         });

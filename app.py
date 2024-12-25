@@ -86,6 +86,7 @@ def login():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('user', None)
