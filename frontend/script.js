@@ -188,20 +188,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 categories.forEach(category => {
                     const categoryButton = document.createElement('button');
                     categoryButton.textContent = category;
-                    categoryButton.className = 'bg-blue-600 text-white p-3 rounded hover:bg-blue-700';
+                    categoryButton.className = 'bg-gradient-to-r from-purple-500 to-pink-400 text-white py-2 px-6 rounded-full hover:bg-gradient-to-r hover:from-pink-400 hover:to-purple-500 transform transition-all duration-300 hover:scale-100 font-roboto text-sm font-semibold tracking-wide shadow-sm hover:shadow-md hover:shadow-pink-400';
                     categoryButton.addEventListener('click', () => {
                         displayFilesByCategory(category, data.files);
                     });
                     categoriesContainer.appendChild(categoryButton);
                 });
-
+    
                 // Show all files by default
                 displayFilesByCategory('All', data.files);
             }
         })
         .catch(err => console.error(err));
     }
-
+    
+    
     function displayFilesByCategory(category, files) {
         fileTableBody.innerHTML = '';
         categoryTitle.textContent = category === 'All' ? 'All Files' : `Files in ${category}`;
@@ -231,3 +232,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 });
+

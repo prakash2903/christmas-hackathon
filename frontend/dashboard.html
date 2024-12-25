@@ -16,7 +16,7 @@
     </div>
 
     <!-- Content Wrapper (Centered) -->
-    <div class="relative z-10 max-w-7xl w-full glowing-container p-12 flex gap-10 min-h-[800px] justify-center">
+    <div class="relative z-10 max-w-7xl w-full glowing-container p-12 flex gap-10 justify-between min-h-[800px]">
 
         <!-- Sidebar -->
         <aside class="w-80 bg-gray-800 text-white flex flex-col shadow-lg rounded-lg">
@@ -26,10 +26,10 @@
             <nav class="flex-1 p-6">
                 <ul>
                     <li class="mb-3">
-                        <a href="upload.html" class="block p-4 rounded hover:bg-cyan-600 transition-transform transform hover:scale-105">Upload Files</a>
+                        <a href="upload.html" class="block p-4 rounded hover:bg-cyan-600 transition-transform transform hover:scale-105 nav-button">Upload Files</a>
                     </li>
                     <li class="mb-3">
-                        <a href="#" class="block p-4 rounded bg-cyan-600 hover:bg-cyan-700 transition-transform transform hover:scale-105">Categories</a>
+                        <a href="#" class="block p-4 rounded bg-cyan-600 hover:bg-cyan-700 transition-transform transform hover:scale-105 nav-button">Categories</a>
                     </li>
                 </ul>
             </nav>
@@ -46,22 +46,21 @@
             </div>
 
             <!-- Files Table (Scrollable) -->
-            <h3 class="text-2xl font-bold mb-4 font-roboto" id="category-title">All Files</h3>
+            <h3 class="text-2xl font-bold mb-6 font-roboto" id="category-title">All Files</h3>
             <div class="overflow-y-auto max-h-[300px]">
-                <table class="w-full bg-white shadow-lg rounded overflow-hidden">
+                <table class="w-full bg-gray-800 shadow-lg rounded overflow-hidden">
                     <thead class="bg-cyan-800 text-white">
                         <tr>
                             <th class="p-4 text-left">Filename</th>
                             <th class="p-4 text-left">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="file-table-body" class="text-gray-700">
+                    <tbody id="file-table-body" class="text-gray-300">
                         <!-- Files will be dynamically added here -->
                     </tbody>
                 </table>
             </div>
         </main>
-
     </div>
 
     <!-- Styles -->
@@ -90,6 +89,23 @@
         }
         .glowing-container:hover {
             box-shadow: 0 0 10px rgba(6, 182, 212, 1), 0 0 20px rgba(6, 182, 212, 0.8);
+        }
+
+        /* Navigation Button Styles */
+        .nav-button {
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+            text-align: center;
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            background-color: rgba(0, 119, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .nav-button:hover {
+            background-color: rgba(6, 182, 212, 1);
+            transform: scale(1.1);
         }
 
         /* Table Styles */
