@@ -3,131 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome | Personal Data Vault</title>
+    <title>Welcome | Data Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
-<body class="bg-gradient-to-r from-blue-500 to-blue-800 min-h-screen flex items-center justify-center">
-    <div class="max-w-lg w-full bg-white rounded-lg shadow-lg overflow-hidden">
+<body class="bg-gradient-to-br from-indigo-900 via-purple-800 to-teal-700 min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Background Illustration -->
+    <div class="absolute inset-0 overflow-hidden z-0">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-purple-600 to-indigo-600 opacity-40 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 right-10 w-80 h-80 bg-gradient-to-br from-teal-500 to-blue-500 opacity-40 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Content Container -->
+    <div class="relative z-10 max-w-3xl w-full bg-opacity-80 backdrop-blur-lg bg-gradient-to-t from-gray-800 to-gray-900 rounded-lg shadow-lg">
         <!-- Header -->
-        <div class="bg-blue-700 text-white text-center py-6">
-            <h1 class="text-3xl font-bold">Welcome to Personal Data Vault</h1>
-            <p class="mt-2 text-sm">Securely upload, encrypt, and manage your files</p>
+        <div class="text-center py-8">
+            <h1 class="text-5xl font-extrabold text-white tracking-wide">Welcome to DataVault</h1>
+            <p class="mt-3 text-gray-400 text-sm">Secure, Encrypt, and Manage your files with futuristic technology</p>
         </div>
 
-        <!-- Forms -->
-        <div class="p-6">
-            <!-- Tab Navigation -->
-            <div class="flex justify-center space-x-6 mb-6">
+        <!-- Tabs and Forms -->
+        <div class="px-8 py-6">
+            <!-- Tabs -->
+            <div class="flex justify-center space-x-4 mb-8">
                 <button id="login-tab" class="tab-button active">Login</button>
                 <button id="register-tab" class="tab-button">Register</button>
             </div>
 
             <!-- Login Form -->
             <form id="login-form" class="form-content">
-                <h2 class="text-xl font-bold mb-4 text-gray-700">Login</h2>
-                <div class="mb-4">
-                    <label for="login-username" class="block text-gray-600 font-bold mb-2">Username</label>
+                <div class="mb-6">
+                    <label for="login-username" class="block text-gray-300 mb-2">Username</label>
                     <input type="text" id="login-username" placeholder="Enter your username" class="input-field">
                 </div>
                 <div class="mb-6">
-                    <label for="login-password" class="block text-gray-600 font-bold mb-2">Password</label>
+                    <label for="login-password" class="block text-gray-300 mb-2">Password</label>
                     <input type="password" id="login-password" placeholder="Enter your password" class="input-field">
                 </div>
-                <button type="submit" class="btn-primary">Login</button>
+                <button type="submit" class="btn-primary w-full">Login</button>
             </form>
 
             <!-- Register Form -->
             <form id="register-form" class="form-content hidden">
-                <h2 class="text-xl font-bold mb-4 text-gray-700">Register</h2>
-                <div class="mb-4">
-                    <label for="register-username" class="block text-gray-600 font-bold mb-2">Username</label>
+                <div class="mb-6">
+                    <label for="register-username" class="block text-gray-300 mb-2">Username</label>
                     <input type="text" id="register-username" placeholder="Choose a username" class="input-field">
                 </div>
                 <div class="mb-6">
-                    <label for="register-password" class="block text-gray-600 font-bold mb-2">Password</label>
+                    <label for="register-password" class="block text-gray-300 mb-2">Password</label>
                     <input type="password" id="register-password" placeholder="Choose a password" class="input-field">
                 </div>
-                <button type="submit" class="btn-primary">Register</button>
+                <button type="submit" class="btn-primary w-full">Register</button>
             </form>
         </div>
     </div>
 
+    <!-- GSAP Animation -->
     <script>
-        // Toggle between login and register forms
+        // Form Toggle with Fade Animations
         const loginTab = document.getElementById('login-tab');
         const registerTab = document.getElementById('register-tab');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
 
         loginTab.addEventListener('click', () => {
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
+            gsap.to(registerForm, { opacity: 0, duration: 0.3, onComplete: () => {
+                registerForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                gsap.fromTo(loginForm, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+            }});
             loginTab.classList.add('active');
             registerTab.classList.remove('active');
         });
 
         registerTab.addEventListener('click', () => {
-            loginForm.classList.add('hidden');
-            registerForm.classList.remove('hidden');
-            loginTab.classList.remove('active');
+            gsap.to(loginForm, { opacity: 0, duration: 0.3, onComplete: () => {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                gsap.fromTo(registerForm, { opacity: 0 }, { opacity: 1, duration: 0.3 });
+            }});
             registerTab.classList.add('active');
+            loginTab.classList.remove('active');
         });
+
+        // Initial GSAP Animations
+        gsap.from(".tab-button", { opacity: 0, y: 20, duration: 0.8, stagger: 0.2 });
+        gsap.from(".form-content", { opacity: 0, duration: 1, delay: 0.5 });
+        gsap.from("h1", { opacity: 0, y: -50, duration: 1 });
     </script>
 
+    <!-- Styles -->
     <style>
         .tab-button {
-            background-color: #e2e8f0;
-            padding: 0.5rem 1rem;
+            flex: 1;
+            padding: 0.75rem;
             font-weight: bold;
-            border-radius: 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.2s;
+            text-align: center;
         }
         .tab-button.active {
-            background-color: #1e3a8a;
-            color: white;
+            background-color: #7c3aed;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.8);
         }
         .tab-button:hover {
-            background-color: #cbd5e1;
-        }
-        .form-content {
-            animation: fadeIn 0.3s ease-in-out;
+            background-color: rgba(255, 255, 255, 0.4);
         }
         .input-field {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #d1d5db;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 0.5rem;
             font-size: 1rem;
+            color: white;
+            transition: border-color 0.3s;
         }
         .input-field:focus {
             outline: none;
-            border-color: #2563eb;
+            border-color: #7c3aed;
         }
         .btn-primary {
-            background-color: #2563eb;
+            background-color: #7c3aed;
             color: white;
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
             border-radius: 0.5rem;
             font-weight: bold;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.2s;
         }
         .btn-primary:hover {
-            background-color: #1d4ed8;
+            background-color: #5b21b6;
+            transform: scale(1.05);
         }
         .hidden {
             display: none;
         }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .flex {
+            display: flex;
+            align-items: center;
         }
     </style>
     <script src="script.js"></script>
