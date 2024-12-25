@@ -13,13 +13,23 @@ app.secret_key = "e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4fede3e4550bff3d0f44ba8
 CORS(app, supports_credentials=True)
 
 # Configure upload folder
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # Use the current working directory
 if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+    os.makedirs(UPLOAD_FOLDER)  # Create the folder if it doesn't exist
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Generate a key for encryption
-key = Fernet.generate_key()
+# Path to store the encryption key
+KEY_FILE = 'encryption.key'
+
+# Generate or load the key
+if os.path.exists(KEY_FILE):
+    with open(KEY_FILE, 'rb') as key_file:
+        key = key_file.read()  # Load the existing key
+else:
+    key = Fernet.generate_key()
+    with open(KEY_FILE, 'wb') as key_file:
+        key_file.write(key)  # Save the key for future use
+
 cipher = Fernet(key)
 
 # Database connection
@@ -101,44 +111,59 @@ def login_required(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
-# Protect upload and download routes
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
     try:
+        # Check if a file is in the request
         if 'file' not in request.files:
             return jsonify({"error": "No file part in the request"}), 400
+
+        # Retrieve the file and category from the request
         file = request.files['file']
         category = request.form.get('category', 'uncategorized')  # Default category if not provided
+
+        # Validate file presence
         if file.filename == '':
             return jsonify({"error": "No selected file"}), 400
 
+        # Generate a secure filename
         filename = secure_filename(file.filename)
+
+        # Construct the filepath
+        if 'UPLOAD_FOLDER' not in app.config:
+            raise ValueError("UPLOAD_FOLDER is not configured")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-        # Encrypt file content
+        # Debug: Log where the file is being uploaded
+        print(f"Uploading file to: {filepath}")
+
+        # Read the file content and encrypt it
         file_content = file.read()
         encrypted_content = cipher.encrypt(file_content)
 
-        # Save the encrypted file
+        # Save the encrypted file to the filesystem
         with open(filepath, 'wb') as encrypted_file:
             encrypted_file.write(encrypted_content)
 
         # Save metadata to the database
-        username = session['user']  # Get the logged-in user's username
-        encryption_key = psycopg2.Binary(key)  # Save the key properly for BYTEA
+        encryption_key = key  # Use the generated key
         cursor.execute(
             "INSERT INTO files (filename, filepath, encryption_key, category, username) VALUES (%s, %s, %s, %s, %s)",
-            (filename, filepath, encryption_key, category, username)
+            (filename, filepath, encryption_key, category, session['user'])
         )
         conn.commit()
 
+        # Success response
         return jsonify({
             "message": "File uploaded, encrypted, and metadata saved successfully!",
             "filename": filename,
             "category": category
         })
+
     except Exception as e:
+        # Debug: Log the exact error to the terminal
+        print(f"Error in upload route: {e}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
@@ -149,17 +174,23 @@ def download_file(filename):
         print(f"Attempting to download file: {filename}")  # Debug log
 
         # Fetch file metadata from the database
-        cursor.execute("SELECT filepath, encryption_key FROM files WHERE filename = %s", (filename,))
+        cursor.execute("SELECT filepath, encryption_key FROM files WHERE filename = %s AND username = %s",
+                       (filename, session.get('user')))
         result = cursor.fetchone()
 
         if not result:
-            print("File not found in database")  # Debug log
-            return jsonify({"error": "File not found"}), 404
+            print("File not found in database or does not belong to the user")  # Debug log
+            return jsonify({"error": "File not found or unauthorized access"}), 404
 
         filepath, encryption_key = result
         print(f"Filepath: {filepath}, Encryption Key: {encryption_key}")  # Debug log
 
-        cipher = Fernet(encryption_key)  # Decryption key is already in bytes
+        if not os.path.exists(filepath):
+            print("File does not exist on disk")  # Debug log
+            return jsonify({"error": "File does not exist"}), 404
+
+        # Initialize the cipher with the encryption key
+        cipher = Fernet(encryption_key)
 
         # Decrypt the file content
         with open(filepath, 'rb') as encrypted_file:
@@ -177,6 +208,7 @@ def download_file(filename):
     except Exception as e:
         print(f"An error occurred: {e}")  # Debug log
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
 
 @app.route('/files', methods=['GET'])
 @login_required
