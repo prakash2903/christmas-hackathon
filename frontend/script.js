@@ -233,3 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    const categoriesBtn = document.getElementById('categories-btn');
+    if (categoriesBtn) {
+        categoriesBtn.addEventListener('click', () => {
+            console.log("Navigating to dashboard for categories"); // Debug log
+            window.location.href = 'dashboard.html'; // Navigate to dashboard.html
+        });
+    }
+});
