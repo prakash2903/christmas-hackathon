@@ -3,45 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Files</title>
+    <title>Upload Files | Data Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-blue-800 text-white flex flex-col">
-            <div class="p-6">
-                <h1 class="text-2xl font-bold">File Dashboard</h1>
-            </div>
-            <nav class="flex-1 p-4">
-                <ul>
-                    <li class="mb-2">
-                        <a href="dashboard.html" class="block p-3 rounded hover:bg-blue-700">Dashboard</a>
-                    </li>
-                    <li class="mb-2">
-                        <a href="#" class="block p-3 rounded bg-blue-700">Upload Files</a>
-                    </li>
-                </ul>
-            </nav>
-            <button id="logout-btn" class="m-6 p-3 bg-red-600 rounded hover:bg-red-700">Logout</button>
-        </aside>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-800 min-h-screen flex">
 
-        <!-- Main Content -->
-        <main class="flex-1 p-6">
-            <h2 class="text-2xl font-bold mb-4">Upload a File</h2>
-            <form id="upload-form" class="bg-white p-6 shadow rounded">
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-bold mb-2">Select File</label>
-                    <input type="file" id="file" class="border rounded w-full p-2">
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-bold mb-2">Category (Optional)</label>
-                    <input type="text" id="category" placeholder="Enter category" class="border rounded w-full p-2">
-                </div>
-                <button type="submit" class="bg-blue-600 text-white p-3 rounded hover:bg-blue-700">Upload</button>
-            </form>
-        </main>
-    </div>
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 text-white flex flex-col shadow-lg">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold glowing-text">File Dashboard</h1>
+        </div>
+        <nav class="flex-1 p-4">
+            <ul>
+                <li class="mb-2">
+                    <a href="dashboard.html" class="block p-3 rounded hover:bg-cyan-700 transition">Dashboard</a>
+                </li>
+                <li class="mb-2">
+                    <a href="#" class="block p-3 rounded bg-cyan-700">Upload Files</a>
+                </li>
+            </ul>
+        </nav>
+        <button id="logout-btn" class="m-6 p-3 bg-red-600 rounded hover:bg-red-700 transition">Logout</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 text-white">
+        <h2 class="text-3xl font-bold mb-6 holographic-text">Upload a File</h2>
+        <form id="upload-form" class="bg-gray-800 p-6 shadow-lg rounded glowing-container">
+            <div class="mb-6">
+                <label class="block text-cyan-300 font-bold mb-2">Select File</label>
+                <input type="file" id="file" class="input-field w-full">
+            </div>
+            <div class="mb-6">
+                <label class="block text-cyan-300 font-bold mb-2">Category (Optional)</label>
+                <input type="text" id="category" placeholder="Enter category" class="input-field w-full">
+            </div>
+            <button type="submit" class="glow-animated-button">Upload</button>
+        </form>
+    </main>
+
+    <!-- Styles -->
+    <style>
+        /* Glowing Text */
+        .glowing-text {
+            color: cyan;
+            text-shadow: 0 0 5px rgba(6, 182, 212, 0.8), 0 0 10px rgba(6, 182, 212, 0.6);
+        }
+
+        /* Glowing Container */
+        .glowing-container {
+            border: 2px solid rgba(6, 182, 212, 0.5);
+            border-radius: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 10px rgba(152, 175, 179, 0.8);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+        .glowing-container:hover {
+            box-shadow: 0 0 10px rgba(6, 182, 212, 1), 0 0 20px rgba(6, 182, 212, 0.8);
+        }
+
+        /* Input Field */
+        .input-field {
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: cyan;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #06b6d4;
+            box-shadow: 0 0 2px #06b6d4;
+        }
+
+        /* Button Styles */
+        .glow-animated-button {
+            position: relative;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            color: white;
+            background: linear-gradient(90deg, rgba(6,182,212,1), rgba(0,119,255,1));
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 10px rgba(6,182,212,0.8);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.3s ease-in-out;
+        }
+        .glow-animated-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(6,182,212,1), 0 0 20px rgba(6,182,212,0.8);
+        }
+    </style>
     <script src="script.js"></script>
 </body>
 </html>
