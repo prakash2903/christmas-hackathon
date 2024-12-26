@@ -71,14 +71,11 @@ Personal Data Vault is a secure platform that allows users to:
 
 ## 🎥 **Demo**
 
-### ✏️ **Login and File Management**
-![Login Demo](demo/login.gif)
+-  ✏️ Login and File Management ✅
+-  📤 File Sharing ✅
+-  📥 File View/Download ✅
 
-### 📤 **File Sharing**
-![Sharing Demo](demo/share.gif)
-
-### 📥 **File Download**
-![Download Demo](demo/download.gif)
+Check the model demo 👉 [here](https://drive.google.com/drive/folders/1T4gK84A6gDwuiwaVzlteX6PnSMZMiift?usp=drive_link)
 
 ---
 
