@@ -75,7 +75,7 @@ Personal Data Vault is a secure platform that allows users to:
 -  📤 File Sharing ✅
 -  📥 File View/Download ✅
 
-Check the model demo 👉 [here](https://drive.google.com/drive/folders/1T4gK84A6gDwuiwaVzlteX6PnSMZMiift?usp=drive_link)
+Check the model demo 👉 [here](https://drive.google.com/drive/folders/1T4gK84A6gDwuiwaVzlteX6PnSMZMiift?usp=sharing)
 
 ---
 
