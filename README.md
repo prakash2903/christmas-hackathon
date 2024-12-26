@@ -8,9 +8,9 @@ A secure, encrypted file management and sharing application to protect your data
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13.3-blue)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0-06B6D4)
 
-<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/index.png" height = 300, width = 425, align=left>
+<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/index.png" height = 300, width = 325, align=left>
 
-<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/upload.png" height = 300, width = 425>
+<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/upload.png" height = 300, width = 325>
 
 ---
 ## 📖 **Table of Contents**
