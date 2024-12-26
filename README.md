@@ -94,9 +94,6 @@ Check the model demo 👉 [here](https://drive.google.com/drive/folders/1T4gK84A
    - Password hashing with `werkzeug.security`.  
    - File encryption using `cryptography.fernet`.
 
-5. **Deployment:** 🚀  
-   - Ready for platforms like Heroku, Render, or AWS.
-
 ---
 
 ## 🚀 **Getting Started**
