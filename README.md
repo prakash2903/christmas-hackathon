@@ -8,8 +8,11 @@ A secure, encrypted file management and sharing application to protect your data
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13.3-blue)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.0-06B6D4)
 
----
+<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/index.png" height = 300, width = 425, align=left>
 
+<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/upload.png" height = 300, width = 425>
+
+---
 ## 📖 **Table of Contents**
 
 1. [🌟 Overview](#-overview)
@@ -61,6 +64,8 @@ Personal Data Vault is a secure platform that allows users to:
 5. **🎨 Dynamic Frontend**
    - TailwindCSS-powered design.
    - Intuitive and user-friendly navigation.
+
+<img src= "https://github.com/prakash2903/christmas-hackathon/blob/main/src/dashboard.png" height = 400, width = 600 align=center>
 
 ---
 
