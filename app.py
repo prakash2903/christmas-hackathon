@@ -7,37 +7,40 @@ import psycopg2
 from flask_cors import CORS
 from psycopg2 import OperationalError
 
+
 # Flask app setup
-app = Flask(__name__, static_folder='frontend')  # Serve frontend files from 'frontend' folder
-app.secret_key = "e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4fede3e4550bff3d0f44ba8b7"  # Replace with a secure random key
+app = Flask(__name__, static_folder='frontend')
+app.secret_key = "e5e9fa1ba31ecd1ae84f75caaa474f3a663f05f4fede3e4550bff3d0f44ba8b7"
 CORS(app, supports_credentials=True)
 
+
 # Configure upload folder
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # Use the current working directory
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads') 
 if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)  # Create the folder if it doesn't exist
+    os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Path to store the encryption key
+
 KEY_FILE = 'encryption.key'
 
 # Generate or load the key
 if os.path.exists(KEY_FILE):
     with open(KEY_FILE, 'rb') as key_file:
-        key = key_file.read()  # Load the existing key
+        key = key_file.read()
 else:
     key = Fernet.generate_key()
     with open(KEY_FILE, 'wb') as key_file:
-        key_file.write(key)  # Save the key for future use
+        key_file.write(key)
 
 cipher = Fernet(key)
+
 
 # Database connection
 try:
     conn = psycopg2.connect(
         dbname="personal_data_vault",
-        user="postgres",  # Replace with your PostgreSQL username
-        password="kash29",  # Replace with your PostgreSQL password
+        user="postgres", 
+        password="kash29",
         host="localhost"
     )
     cursor = conn.cursor()
@@ -46,7 +49,8 @@ except OperationalError as e:
     conn = None
     cursor = None
 
-# Serve static frontend files
+
+# --- INDEX - LANDING PAGE ---
 @app.route('/')
 def index():
     return send_from_directory(app.static_folder, 'index.html')
@@ -55,7 +59,8 @@ def index():
 def serve_file(filename):
     return send_from_directory(app.static_folder, filename)
 
-# Routes for authentication
+
+# --- REGISTER ---
 @app.route('/register', methods=['POST'])
 def register():
     try:
@@ -73,6 +78,8 @@ def register():
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
+
+# --- LOG IN ---
 @app.route('/login', methods=['POST'])
 def login():
     try:
@@ -97,6 +104,7 @@ def login():
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
+# --- LOG OUT ---
 @app.route('/logout', methods=['POST'])
 def logout():
     session.pop('user', None)
@@ -111,6 +119,8 @@ def login_required(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
+
+# --- UPLOAD ---
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
@@ -121,7 +131,7 @@ def upload_file():
 
         # Retrieve the file and category from the request
         file = request.files['file']
-        category = request.form.get('category', 'uncategorized')  # Default category if not provided
+        category = request.form.get('category', 'uncategorized')
 
         # Validate file presence
         if file.filename == '':
@@ -134,8 +144,6 @@ def upload_file():
         if 'UPLOAD_FOLDER' not in app.config:
             raise ValueError("UPLOAD_FOLDER is not configured")
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-        # Debug: Log where the file is being uploaded
         print(f"Uploading file to: {filepath}")
 
         # Read the file content and encrypt it
@@ -147,14 +155,13 @@ def upload_file():
             encrypted_file.write(encrypted_content)
 
         # Save metadata to the database
-        encryption_key = key  # Use the generated key
+        encryption_key = psycopg2.Binary(key)  # Properly wrap the key
         cursor.execute(
             "INSERT INTO files (filename, filepath, encryption_key, category, username) VALUES (%s, %s, %s, %s, %s)",
             (filename, filepath, encryption_key, category, session['user'])
         )
         conn.commit()
 
-        # Success response
         return jsonify({
             "message": "File uploaded, encrypted, and metadata saved successfully!",
             "filename": filename,
@@ -162,62 +169,131 @@ def upload_file():
         })
 
     except Exception as e:
-        # Debug: Log the exact error to the terminal
         print(f"Error in upload route: {e}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
+# --- DOWNLOAD ---
 @app.route('/download/<filename>', methods=['GET'])
 @login_required
 def download_file(filename):
     try:
-        print(f"Attempting to download file: {filename}")  # Debug log
+        username = session['user']
+        print(f"User {username} attempting to download file: {filename}")
 
-        # Fetch file metadata from the database
-        cursor.execute("SELECT filepath, encryption_key FROM files WHERE filename = %s AND username = %s",
-                       (filename, session.get('user')))
+        cursor.execute(
+            """
+            SELECT f.filepath, f.encryption_key
+            FROM files f
+            LEFT JOIN shared_files sf ON f.filename = sf.filename
+            WHERE (f.username = %s OR sf.friend = %s) AND f.filename = %s
+            ORDER BY f.upload_date DESC
+            LIMIT 1
+            """,
+            (username, username, filename)
+        )
         result = cursor.fetchone()
 
         if not result:
-            print("File not found in database or does not belong to the user")  # Debug log
+            print("File not found or unauthorized access")
             return jsonify({"error": "File not found or unauthorized access"}), 404
 
         filepath, encryption_key = result
-        print(f"Filepath: {filepath}, Encryption Key: {encryption_key}")  # Debug log
+        print(f"Filepath: {filepath}, Encryption Key: {encryption_key}")
 
+        # Ensure the file exists on the disk
         if not os.path.exists(filepath):
-            print("File does not exist on disk")  # Debug log
+            print("File does not exist on disk")
             return jsonify({"error": "File does not exist"}), 404
 
-        # Initialize the cipher with the encryption key
-        cipher = Fernet(encryption_key)
-
-        # Decrypt the file content
+        # Decrypt the file
+        cipher = Fernet(encryption_key) 
         with open(filepath, 'rb') as encrypted_file:
             encrypted_content = encrypted_file.read()
         decrypted_content = cipher.decrypt(encrypted_content)
 
-        # Save the decrypted content temporarily for download
+        # Save the decrypted file temporarily for download
         temp_filepath = os.path.join(app.config['UPLOAD_FOLDER'], f"decrypted_{filename}")
         with open(temp_filepath, 'wb') as temp_file:
             temp_file.write(decrypted_content)
 
-        print(f"Decrypted file saved at: {temp_filepath}")  # Debug log
+        print(f"Decrypted file saved at: {temp_filepath}")
         return send_file(temp_filepath, as_attachment=True)
 
     except Exception as e:
-        print(f"An error occurred: {e}")  # Debug log
+        print(f"Error in /download route: {e}")
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
+# --- FILES ENDPOINT ---
 @app.route('/files', methods=['GET'])
 @login_required
 def get_files():
     try:
-        username = session['user']  # Get the logged-in user's username
+        username = session['user']
         cursor.execute("SELECT filename, category FROM files WHERE username = %s", (username,))
         files = cursor.fetchall()
         return jsonify({"files": [{"filename": f[0], "category": f[1]} for f in files]})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
+# --- SHARE WITH FRIENDS ---
+@app.route('/share', methods=['POST'])
+@login_required
+def share_file():
+    try:
+        data = request.get_json()
+        owner = session['user'] 
+        friend = data['friend']
+        filename = data['filename']
+
+        # Check if the file exists and belongs to the logged-in user
+        cursor.execute(
+            "SELECT * FROM files WHERE username = %s AND filename = %s",
+            (owner, filename)
+        )
+        file = cursor.fetchone()
+        if not file:
+            return jsonify({"error": "File not found or unauthorized access"}), 404
+
+        # Insert into shared_files table
+        cursor.execute(
+            "INSERT INTO shared_files (owner, friend, filename) VALUES (%s, %s, %s)",
+            (owner, friend, filename)
+        )
+        conn.commit()
+
+        return jsonify({"message": f"File '{filename}' shared successfully with {friend}!"})
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
+# --- SHARED WITH ME ---
+@app.route('/shared-with-me', methods=['GET'])
+@login_required
+def shared_with_me():
+    try:
+        friend = session['user']
+
+        # Get the list of files shared with the user
+        cursor.execute(
+            "SELECT owner, filename, share_date FROM shared_files WHERE friend = %s",
+            (friend,)
+        )
+        shared_files = cursor.fetchall()
+
+        if not shared_files:
+            return jsonify({"message": "No files shared with you yet!"})
+
+        # Prepare the response
+        files = [
+            {"owner": file[0], "filename": file[1], "share_date": file[2].strftime("%Y-%m-%d %H:%M:%S")}
+            for file in shared_files
+        ]
+        return jsonify({"shared_files": files})
+
     except Exception as e:
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
