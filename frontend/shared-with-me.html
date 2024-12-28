@@ -7,14 +7,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-800 min-h-screen flex items-center justify-center">
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-cyan-800 min-h-screen flex flex-col items-center justify-center space-y-10">
+
+    <!-- Back to Dashboard Button -->
+    <div class="absolute top-6 left-6">
+        <a href="dashboard.html" class="inline-block bg-cyan-600 text-white font-bold px-6 py-2 rounded-lg hover:bg-cyan-700 transition-transform transform hover:scale-105">
+            ← Back to Dashboard
+        </a>
+    </div>
 
     <!-- Shared Files Container -->
-    <div class="p-12 bg-gray-800 text-white rounded-lg shadow-lg max-w-3xl w-full glowing-container">
-        <h2 class="text-4xl font-bold holographic-text font-orbitron mb-6">Files Shared with Me</h2>
-        <ul id="shared-files-list" class="space-y-4">
+    <div class="p-12 bg-gray-800 text-white rounded-lg shadow-lg max-w-4xl w-full glowing-container">
+        <h2 class="text-5xl font-bold holographic-text font-orbitron mb-10 text-center">Files Shared with Me</h2>
+        
+        <div id="shared-files-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Shared files will be dynamically added here -->
-        </ul>
+        </div>
+
+        <p id="no-files-message" class="text-center text-gray-400 mt-6 hidden">No files shared with you yet.</p>
     </div>
 
     <script>
@@ -26,32 +36,48 @@
                 });
                 const data = await response.json();
                 const list = document.getElementById('shared-files-list');
-
-                if (response.ok && data.shared_files) {
+                const noFilesMessage = document.getElementById('no-files-message');
+    
+                if (response.ok && data.shared_files && data.shared_files.length > 0) {
+                    list.innerHTML = ''; // Clear existing content
+    
+                    // Sort files by share_date (most recent first)
+                    data.shared_files.sort((a, b) => new Date(b.share_date) - new Date(a.share_date));
+    
+                    // Format the date and populate the list
                     data.shared_files.forEach(file => {
-                        const listItem = document.createElement('li');
-                        listItem.classList.add('p-4', 'bg-gray-700', 'rounded-lg', 'glowing-container');
+                        const listItem = document.createElement('div');
+                        listItem.classList.add('p-6', 'bg-gray-700', 'rounded-lg', 'glowing-container', 'flex', 'flex-col', 'space-y-4');
+    
+                        const formattedDate = formatDate(file.share_date);
                         listItem.innerHTML = `
                             <p><strong>Filename:</strong> ${file.filename}</p>
                             <p><strong>Shared by:</strong> ${file.owner}</p>
-                            <p><strong>Date:</strong> ${file.share_date}</p>
-                            <button class="btn-primary mt-2" onclick="downloadFile('${file.filename}')">Download</button>
+                            <p><strong>Date:</strong> ${formattedDate}</p>
+                            <button class="btn-primary" onclick="downloadFile('${file.filename}')">Download</button>
                         `;
                         list.appendChild(listItem);
                     });
                 } else {
-                    list.innerHTML = `<p class="text-center">${data.message || 'No files shared with you.'}</p>`;
+                    noFilesMessage.classList.remove('hidden');
                 }
             } catch (error) {
                 console.error(error);
                 alert('An error occurred while fetching shared files.');
             }
         });
-
+    
+        // Function to format the date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+            return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
+        }
+    
         function downloadFile(filename) {
             window.location.href = `/download/${filename}`;
         }
     </script>
+    
 
     <!-- Styles -->
     <style>
@@ -77,6 +103,8 @@
             background: linear-gradient(90deg, rgba(6,182,212,1), rgba(0,119,255,1));
             border: none;
             border-radius: 0.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
             box-shadow: 0 0 15px rgba(6,182,212,0.8);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.3s ease-in-out;
@@ -90,7 +118,16 @@
         /* Glowing Text */
         .holographic-text {
             color: cyan;
-            text-shadow: 0 0 2px rgba(6, 182, 212, 0.8), 0 0 5px rgba(6, 182, 212, 0.6);
+            text-shadow: 0 0 5px rgba(6, 182, 212, 0.8), 0 0 15px rgba(6, 182, 212, 0.6);
+        }
+
+        /* Responsive Layout */
+        @media (min-width: 768px) {
+            #shared-files-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
         }
     </style>
 
