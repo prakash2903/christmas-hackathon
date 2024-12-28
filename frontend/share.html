@@ -21,7 +21,9 @@
 
             <div>
                 <label for="filename" class="block text-sm font-medium text-cyan-300 font-roboto">File to Share</label>
-                <input type="text" id="filename" class="input-field w-full" placeholder="Enter filename">
+                <select id="filename" class="input-field w-full">
+                    <!-- Files will be dynamically populated here -->
+                </select>
             </div>
 
             <button type="submit" class="btn-primary w-full">Share</button>
@@ -29,6 +31,35 @@
     </div>
 
     <script>
+        // Fetch user's files to populate the dropdown
+        async function fetchFiles() {
+            try {
+                const response = await fetch('/files', { method: 'GET', credentials: 'include' });
+                const data = await response.json();
+
+                if (response.ok && data.files) {
+                    const fileDropdown = document.getElementById('filename');
+                    fileDropdown.innerHTML = ''; // Clear any existing options
+
+                    data.files.forEach(file => {
+                        const option = document.createElement('option');
+                        option.value = file.filename;
+                        option.textContent = file.filename;
+                        fileDropdown.appendChild(option);
+                    });
+                } else {
+                    alert(data.error || 'Failed to load files.');
+                }
+            } catch (error) {
+                console.error('Error fetching files:', error);
+                alert('An error occurred while fetching your files.');
+            }
+        }
+
+        // Populate the dropdown when the page loads
+        document.addEventListener('DOMContentLoaded', fetchFiles);
+
+        // Handle the form submission for sharing
         document.getElementById('share-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const friend = document.getElementById('friend').value;
@@ -48,7 +79,7 @@
                     alert(data.error || 'An error occurred.');
                 }
             } catch (error) {
-                console.error(error);
+                console.error('Error sharing file:', error);
                 alert('An error occurred.');
             }
         });
