@@ -152,12 +152,3 @@ python app.py
 4. **File Versioning**:
 
    - Allow users to upload and manage different versions of the same file.
-
-## 🤝 **Contributing**
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository.
-2. Create a new branch for your feature or bugfix.
-3. Commit and push your changes.
-4. Submit a pull request explaining your changes.
