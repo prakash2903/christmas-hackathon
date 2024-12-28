@@ -22,7 +22,6 @@ A secure, encrypted file management and sharing application to protect your data
 5. [🚀 Getting Started](#-getting-started)
 6. [⚙️ Usage](#-usage)
 7. [📈 Future Enhancements](#-future-enhancements)
-8. [🤝 Contributing](#-contributing)
 
 ---
 
