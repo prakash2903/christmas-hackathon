@@ -16,15 +16,40 @@
         </a>
     </div>
 
-    <!-- Shared Files Container -->
-    <div class="p-12 bg-gray-800 text-white rounded-lg shadow-lg max-w-4xl w-full glowing-container">
-        <h2 class="text-5xl font-bold holographic-text font-orbitron mb-10 text-center">Files Shared with Me</h2>
+    <!-- Tab Navigation -->
+    <div class="flex justify-center space-x-4 mb-6">
+        <button id="card-tab" class="tab-button active">Card View</button>
+        <button id="table-tab" class="tab-button">Table View</button>
+    </div>
+
+    <!-- Shared Files Container (Card View) -->
+    <div id="card-view" class="p-6 bg-gray-800 text-white rounded-lg shadow-lg max-w-4xl w-full glowing-container">
+        <h2 class="text-4xl font-bold holographic-text font-orbitron mb-6 text-center">Files Shared with Me</h2>
         
-        <div id="shared-files-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div id="shared-files-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Shared files will be dynamically added here -->
         </div>
 
-        <p id="no-files-message" class="text-center text-gray-400 mt-6 hidden">No files shared with you yet.</p>
+        <p id="no-files-message" class="text-center text-gray-400 mt-4 hidden">No files shared with you yet.</p>
+    </div>
+
+    <!-- Shared Files Container (Table View) -->
+    <div id="table-view" class="hidden p-6 bg-gray-800 text-white rounded-lg shadow-lg max-w-4xl w-full glowing-container">
+        <h2 class="text-4xl font-bold holographic-text font-orbitron mb-6 text-center">Files Shared with Me</h2>
+        <table class="table-auto w-full border-collapse">
+            <thead class="bg-cyan-700 text-white">
+                <tr>
+                    <th class="p-3 text-sm font-bold uppercase tracking-wide">Filename</th>
+                    <th class="p-3 text-sm font-bold uppercase tracking-wide">Shared By</th>
+                    <th class="p-3 text-sm font-bold uppercase tracking-wide">Date</th>
+                    <th class="p-3 text-sm font-bold uppercase tracking-wide">Action</th>
+                </tr>
+            </thead>
+            <tbody id="shared-files-table">
+                <!-- Rows will be dynamically added here -->
+            </tbody>
+        </table>
+        <p id="no-files-message-table" class="text-center text-gray-400 mt-4 hidden">No files shared with you yet.</p>
     </div>
 
     <script>
@@ -35,31 +60,13 @@
                     credentials: 'include',
                 });
                 const data = await response.json();
-                const list = document.getElementById('shared-files-list');
-                const noFilesMessage = document.getElementById('no-files-message');
 
                 if (response.ok && data.shared_files && data.shared_files.length > 0) {
-                    list.innerHTML = ''; // Clear existing content
-
-                    // Sort files by share_date (most recent first)
-                    data.shared_files.sort((a, b) => new Date(b.share_date) - new Date(a.share_date));
-
-                    // Format the date and populate the list
-                    data.shared_files.forEach(file => {
-                        const listItem = document.createElement('div');
-                        listItem.classList.add('p-6', 'bg-gray-700', 'rounded-lg', 'glowing-container', 'flex', 'flex-col', 'space-y-4');
-
-                        const formattedDate = formatDate(file.share_date);
-                        listItem.innerHTML = `
-                            <p class="text-lg font-semibold text-cyan-400">Filename: <span class="text-gray-200">${file.filename}</span></p>
-                            <p class="text-lg font-semibold text-cyan-400">Shared by: <span class="text-gray-200">${file.owner}</span></p>
-                            <p class="text-lg font-semibold text-cyan-400">Date: <span class="text-gray-200">${formattedDate}</span></p>
-                            <button class="btn-primary mt-4 self-start" onclick="downloadFile('${file.filename}')">Download</button>
-                        `;
-                        list.appendChild(listItem);
-                    });
+                    populateCardView(data.shared_files);
+                    populateTableView(data.shared_files);
                 } else {
-                    noFilesMessage.classList.remove('hidden');
+                    document.getElementById('no-files-message').classList.remove('hidden');
+                    document.getElementById('no-files-message-table').classList.remove('hidden');
                 }
             } catch (error) {
                 console.error(error);
@@ -67,7 +74,46 @@
             }
         });
 
-        // Function to format the date
+        function populateCardView(files) {
+            const list = document.getElementById('shared-files-list');
+            list.innerHTML = ''; // Clear existing content
+
+            files.sort((a, b) => new Date(b.share_date) - new Date(a.share_date));
+
+            files.forEach(file => {
+                const listItem = document.createElement('div');
+                listItem.classList.add('p-4', 'bg-gray-700', 'rounded-lg', 'glowing-container', 'flex', 'flex-col', 'space-y-2');
+
+                const formattedDate = formatDate(file.share_date);
+                listItem.innerHTML = `
+                    <p class="text-sm font-semibold text-cyan-400">Filename: <span class="text-gray-200">${file.filename}</span></p>
+                    <p class="text-sm font-semibold text-cyan-400">Shared by: <span class="text-gray-200">${file.owner}</span></p>
+                    <p class="text-sm font-semibold text-cyan-400">Date: <span class="text-gray-200">${formattedDate}</span></p>
+                    <button class="btn-primary-sm mt-2" onclick="downloadFile('${file.filename}')">Download</button>
+                `;
+                list.appendChild(listItem);
+            });
+        }
+
+        function populateTableView(files) {
+            const table = document.getElementById('shared-files-table');
+            table.innerHTML = ''; // Clear existing rows
+
+            files.sort((a, b) => new Date(b.share_date) - new Date(a.share_date));
+
+            files.forEach(file => {
+                const formattedDate = formatDate(file.share_date);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="p-3 text-gray-200 text-sm">${file.filename}</td>
+                    <td class="p-3 text-gray-200 text-sm">${file.owner}</td>
+                    <td class="p-3 text-gray-200 text-sm">${formattedDate}</td>
+                    <td class="p-3"><button class="btn-primary-sm" onclick="downloadFile('${file.filename}')">Download</button></td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
         function formatDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
             return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
@@ -76,6 +122,26 @@
         function downloadFile(filename) {
             window.location.href = `/download/${filename}`;
         }
+
+        // Tab Navigation
+        const cardView = document.getElementById('card-view');
+        const tableView = document.getElementById('table-view');
+        const cardTab = document.getElementById('card-tab');
+        const tableTab = document.getElementById('table-tab');
+
+        cardTab.addEventListener('click', () => {
+            cardView.classList.remove('hidden');
+            tableView.classList.add('hidden');
+            cardTab.classList.add('active');
+            tableTab.classList.remove('active');
+        });
+
+        tableTab.addEventListener('click', () => {
+            tableView.classList.remove('hidden');
+            cardView.classList.add('hidden');
+            tableTab.classList.add('active');
+            cardTab.classList.remove('active');
+        });
     </script>
 
     <!-- Styles -->
@@ -93,23 +159,44 @@
             box-shadow: 0 0 10px rgba(6, 182, 212, 1), 0 0 20px rgba(6, 182, 212, 0.8);
         }
 
-        /* Buttons */
-        .btn-primary {
-            position: relative;
+        /* Tabs */
+        .tab-button {
             padding: 0.75rem 1.5rem;
             font-size: 1rem;
-            color: white;
-            background: linear-gradient(90deg, rgba(6,182,212,1), rgba(0,119,255,1));
-            border: none;
-            border-radius: 0.5rem;
             font-weight: bold;
-            text-transform: uppercase;
-            box-shadow: 0 0 15px rgba(6,182,212,0.8);
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.3s ease-in-out;
+            color: cyan;
+            background-color: transparent;
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .btn-primary:hover {
+        .tab-button.active {
+            color: white;
+            background-color: rgba(6, 182, 212, 0.2);
+            border-color: rgba(6, 182, 212, 1);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+        }
+
+        .tab-button:hover {
+            background-color: rgba(6, 182, 212, 0.1);
+        }
+
+        /* Buttons */
+        .btn-primary-sm {
+            background: linear-gradient(90deg, rgba(6,182,212,1), rgba(0,119,255,1));
+            color: white;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 0 10px rgba(6,182,212,0.8);
+            transition: transform 0.3s, box-shadow 0.3s ease-in-out;
+        }
+
+        .btn-primary-sm:hover {
             transform: scale(1.05);
             box-shadow: 0 0 10px rgba(6,182,212,1), 0 0 20px rgba(6,182,212,0.8);
         }
@@ -118,20 +205,6 @@
         .holographic-text {
             color: cyan;
             text-shadow: 0 0 5px rgba(6, 182, 212, 0.8), 0 0 15px rgba(6, 182, 212, 0.6);
-        }
-
-        /* Text Customization */
-        p span {
-            font-weight: normal;
-        }
-
-        /* Responsive Layout */
-        @media (min-width: 768px) {
-            #shared-files-list {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
         }
     </style>
 
